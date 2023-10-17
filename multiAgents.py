@@ -158,6 +158,43 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
+        def minMax(s, depth, isMaxPlayer):
+            print("Hi")
+            pacmanState = s.getPacmanState()
+            print("Hi2")
+            if depth == 0 or gameState.isLose() or gameState.isWin():
+                return self.evaluationFunction
+            
+            if not isMaxPlayer:
+                minVal = -9999
+                for successor in gameState.generateSuccessor(pacmanState.pos, pacmanState.direction):
+                    val = minMax(successor, depth-1, True)
+                    minVal = min(val, minVal)
+                return minVal
+            
+            else:
+                maxVal = 9999
+                for successor in gameState.generateSuccessor(pacmanState.pos, pacmanState.direction):
+                    val = minMax(successor, depth-1, False)
+                    maxVal = min(val, maxVal)
+                return maxVal
+        
+        minMax(gameState, self.depth, True)
+
+        # print(self.depth)
+        # print("EVAL FUNC", self.evaluationFunction)
+        # legalMoves = gameState.getLegalActions()
+        # print(legalMoves)
+
+
+        # # Choose one of the best actions
+        # scores = [self.evaluationFunction(gameState) for action in legalMoves]
+        # bestScore = max(scores)
+        # bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        # chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+
+        # return legalMoves[chosenIndex]
+        # return legalMoves
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
