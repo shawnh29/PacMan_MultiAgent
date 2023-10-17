@@ -98,20 +98,6 @@ class ReflexAgent(Agent):
             current_score += 100
 
         return current_score
-        # print(newPos)
-        # if newPos not in newGhostStates:
-        #     count += 1
-        # if current_pacman != newPos:
-        #     count += 1
-        # print(currentGameState.getPacmanPosition())
-        # print(newFood.asList())
-        # print(currentGameState.getGhostPosition(newGhostStates))
-        # print(newScaredTimes)
-        # print(newGhostStates)
-
-        # Manhattan Distance??
-        # return ( (1/4) * len(newFood.asList()) + (1/2) * util.manhattanDistance(pac, min(successorGameState.getGhostPositions())) )
-        # return (1/3) * util.manhattanDistance(current_pacman, min(newFood.asList())) + (2/3) * util.manhattanDistance(current_pacman, min(successorGameState.getGhostPositions()))
 
 def scoreEvaluationFunction(currentGameState):
     """
