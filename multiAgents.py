@@ -74,14 +74,35 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        current_pacman = currentGameState.getPacmanPosition()
-        count = 0
+        current_pacman_pos = currentGameState.getPacmanPosition()
+        current_score = currentGameState.getScore()
+        foodList = newFood.asList()
 
+        min_food = 9999
+        for food in foodList:
+            distance = util.manhattanDistance(food, newPos)
+            if distance < min_food:
+                min_food = distance
+        ghostPosition = successorGameState.getGhostPosition(1)
+        ghostDistance = util.manhattanDistance(ghostPosition, newPos)
+        if ghostDistance > 4:
+            current_score += 200
+        else:
+            current_score -= 15
+        
+        if current_pacman_pos != newPos:
+            current_score += 10
+
+        current_score += 100 / min_food
+        if len(currentGameState.getFood().asList()) > len(foodList):
+            current_score += 100
+
+        return current_score
         # print(newPos)
         # if newPos not in newGhostStates:
         #     count += 1
         # if current_pacman != newPos:
-        #     return successorGameState.getScore() + 1
+        #     count += 1
         # print(currentGameState.getPacmanPosition())
         # print(newFood.asList())
         # print(currentGameState.getGhostPosition(newGhostStates))
@@ -89,7 +110,8 @@ class ReflexAgent(Agent):
         # print(newGhostStates)
 
         # Manhattan Distance??
-        return successorGameState.getScore() + 1 / util.manhattanDistance(current_pacman, max(newFood.asList())) + count
+        # return ( (1/4) * len(newFood.asList()) + (1/2) * util.manhattanDistance(pac, min(successorGameState.getGhostPositions())) )
+        # return (1/3) * util.manhattanDistance(current_pacman, min(newFood.asList())) + (2/3) * util.manhattanDistance(current_pacman, min(successorGameState.getGhostPositions()))
 
 def scoreEvaluationFunction(currentGameState):
     """
