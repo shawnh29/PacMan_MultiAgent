@@ -158,55 +158,176 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        def minimax(depth, state, agent):
-            if depth == self.depth or state.isWin() or state.isLose():
-                return self.evaluationFunction(state)
-            if agent == 0: # meaning it's Pacman
-                # Pacman wants to maximize
-                max = -9999
-                for newState in state.getLegalActions():
-                    val = minimax(depth, state.generateSuccessor(agent, newState), 1)
-                    if val > max:
-                        max = val
-                    return max
-            else: # meaning it's not Pacman, the other ghosts
-                # ghosts want to minimize
-                nextGhostAg = agent + 1
-                if nextGhostAg == state.getNumAgents():
-                    nextGhostAg = 0
-                if nextGhostAg == 0:
-                    depth += 1
 
-                min = 9999
-                for newState in state.getLegalActions():
-                    val = minimax(depth, state.generateSuccessor(agent, newState), nextGhostAg)
-                    if val < min:
-                        min = val
-                    return min
+        def min_value(state, agent, depth):
+            minV = [99999, ""]
 
-        maxVal = -9999
-        result_action = Directions.STOP
-        for state in gameState.getLegalActions(0):
-            val = minimax(0, gameState.generateSuccessor(0, state), 1)
-            if val > maxVal:
-                maxVal = val
-                result_action = state
+            # go through every action this agent can take, evaluate the minimum value that will propogate up
+            for move in state.getLegalActions(agent):
+                val = minimax(state.generateSuccessor(agent, move), agent + 1, depth)
+                if val[0] < minV[0]:
+                    minV = [val[0], move]
+            return minV
 
-        return result_action
+        def max_value(state, agent, depth):
+            maxV = [-99999, ""]
+            
+            # go through every action this agent can take, evaluate the maximum value that will propogate up
+            for move in state.getLegalActions(agent):
+                val = minimax(state.generateSuccessor(agent, move), agent + 1, depth)
+                if val[0] > maxV[0]:
+                    maxV = [val[0], move]
+            return maxV
+    
+        def minimax(state, agent, depth):
+            # BASE CASE: if we are at depth 0 or the game is over
+            if depth == 0 or state.isWin() or state.isLose():
+                return (self.evaluationFunction(state), "FINISHED")
+            
+            # computing which agent we are looking at
+            # using % modulus operator deal with agent values that exceed the number of total agents (ex. 10 % 9 = 1)
+            agent %= state.getNumAgents()
+
+            # we go to the next level once we're done looking at all the agents at the current level
+            if agent == state.getNumAgents() - 1:
+                depth -= 1
+            if agent == 0: # if the agent is Pacman
+                return max_value(state, agent, depth)
+            else: # if the agent is a ghost
+                return min_value(state, agent, depth)
+            
+        # initial call, starting with agent = Pacman
+        bestMove = minimax(gameState, 0, self.depth)
+        return bestMove[1]
+
+
+########################################################################
+        # def min_value(state, depth, agent):
+        #     min = ["", float("inf")]
+        #     actions = state.getLegalActions(agent)
+        #     # if not state.getLegalActions(agent):
+        #     #     return self.evaluationFunction(state)
+            
+        #     for action in actions:
+        #         c = state.generateSuccessor(agent, action)
+        #         cur = minimax(c, depth, agent + 1)
+
+        #         if type(cur) is not list:
+        #             newVal = cur
+        #         else: 
+        #             newVal = cur[1]
+        #         if newVal < min[1]:
+        #             min = [action, newVal]
+        #     return min            
+            
+        # def max_value(state, depth, agent):
+        #     max = ["", float("inf")]
+        #     actions = state.getLegalActions(agent)
+        #     # if not state.getLegalActions(agent):
+        #     #     return self.evaluationFunction(state)
+            
+        #     for action in actions:
+        #         c = state.generateSuccessor(agent, action)
+        #         cur = minimax(c, depth, agent + 1)
+                
+        #         if type(cur) is not list:
+        #             newVal = cur
+        #         else:
+        #             newVal = cur[1]
+        #         if newVal > max[1]:
+        #             max = [action, newVal]
+        #     return max
+
+        # def minimax(state, depth, agent): 
+        #     if agent >= gameState.getNumAgents():
+        #         agent = 0
+        #         depth += 1
+
+        #     if depth == self.depth or state.isWin() or state.isLose():
+        #         return self.evaluationFunction(state)
+            
+        #     if agent == 0:
+        #         return max_value(state, depth, agent)
+        #     else:
+        #         return min_value(state, depth, agent)
+
+
+        # best_action = minimax(gameState, 0, 0)
+        # return best_action[0]
+        
+######################################################
+        # def minimax(depth, agent, state):
+        #     if depth == 0 or state.isWin() or state.isLose():
+        #         return self.evaluationFunction(state)
+            
+        #     if agent == 0: # It's pacman, maximizing player
+        #         max = -9999
+        #         for nextState in state.getLegalActions():
+        #             val = minimax(depth, 1, state.generateSuccessor(1, nextState))
+        #             if val > max:
+        #                 max = val
+        #         return max
+            
+        #     else: # It's one of the ghosts, minimizing player
+        #         min = 9999
+        #         nextGhostAgent = agent + 1
+        #         if agent == state.getNumAgents()-1: # if the agent is the last one we need to visit at this level
+        #             # nextGhostAgent = 0
+        #             depth -= 1
+
+        #         for nextState in state.getLegalActions():
+        #             val = minimax(depth, agent+1, state.generateSuccessor(agent+1, nextState))
+        #             if val < min:
+        #                 min = val
+        #         return min
+        
+        # maxVal = -9999
+        # bestAction = Directions.STOP
+        # for a in gameState.getLegalActions():
+        #     eval = minimax(self.depth, 0, gameState.generateSuccessor(1, a))
+        #     if eval > maxVal:
+        #         maxVal = eval
+        #         bestAction = a
+
+        # return bestAction
+#####################################################################################################################
+        # def minimax(depth, state, agent):
+        #     if depth == self.depth or state.isWin() or state.isLose():
+        #         return self.evaluationFunction(state)
+        #     if agent == 0: # meaning it's Pacman
+        #         # Pacman wants to maximize
+        #         max = -9999
+        #         for newState in state.getLegalActions():
+        #             val = minimax(depth, state.generateSuccessor(agent, newState), agent + 1)
+        #             if val > max:
+        #                 max = val
+        #             return max
+        #     else: # meaning it's not Pacman, the other ghosts
+        #         # ghosts want to minimize
+        #         nextGhostAg = agent + 1
+        #         if nextGhostAg == state.getNumAgents():
+        #             nextGhostAg = 0
+        #         if nextGhostAg == 0:
+        #             depth += 1
+
+        #         min = 9999
+        #         for newState in state.getLegalActions():
+        #             val = minimax(depth, state.generateSuccessor(agent, newState), nextGhostAg)
+        #             if val < min:
+        #                 min = val
+        #             return min
+
+        # maxVal = -9999
+        # result_action = Directions.STOP
+        # for state in gameState.getLegalActions(0):
+        #     val = minimax(0, gameState.generateSuccessor(0, state), 1)
+        #     if val > maxVal:
+        #         maxVal = val
+        #         result_action = state
+
+        # return result_action
             
         # minimax(self.depth, gameState, 0) 
-
-        # print("param state: ", gameState)
-        # print("state ", gameState.state)
-        # print("state type: ", type(gameState.state))
-        # print("Problem, startState: ", gameState.problem)
-        # legalMoves = gameState.getLegalActions()
-        # self.minMax(gameState.state, self.depth, True)
-        # scores = [self.minMax(gameState, self.depth, True) for i in legalMoves]
-        # bestScore = max(scores)
-        # bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
-        # chosenIndex = random.choice(bestIndices)
-        # return legalMoves[chosenIndex]
 
         util.raiseNotDefined()
 
@@ -220,6 +341,56 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
+        def min_value(state, agent, depth, alpha, beta):
+            minV = [99999, ""]
+
+            # go through every action this agent can take, evaluate the minimum value that will propogate up
+            for move in state.getLegalActions(agent):
+                val = minimax(state.generateSuccessor(agent, move), agent + 1, depth, alpha, beta)
+                if val[0] < minV[0]:
+                    minV = [val[0], move]
+
+                # if the min value we computed is less than MAX's best option, prune
+                if minV[0] < alpha:
+                    return minV
+                beta = min(beta, minV[0])
+            return minV
+
+        def max_value(state, agent, depth, alpha, beta):
+            maxV = [-99999, ""]
+            
+            # go through every action this agent can take, evaluate the maximum value that will propogate up
+            for move in state.getLegalActions(agent):
+                val = minimax(state.generateSuccessor(agent, move), agent + 1, depth, alpha, beta)
+                if val[0] > maxV[0]:
+                    maxV = [val[0], move]
+                
+                # if the max value we computed is greater than MIN's best option, prune
+                if maxV[0] > beta:
+                    return maxV
+                alpha = max(alpha, maxV[0])
+            return maxV
+    
+        def minimax(state, agent, depth, alpha, beta):
+            # BASE CASE: if we are at depth 0 or the game is over
+            if depth == 0 or state.isWin() or state.isLose():
+                return (self.evaluationFunction(state), "FINISHED")
+            
+            # computing which agent we are looking at
+            # using % modulus operator deal with agent values that exceed the number of total agents (ex. 10 % 9 = 1)
+            agent %= state.getNumAgents()
+
+            # we go to the next level once we're done looking at all the agents at the current level
+            if agent == state.getNumAgents() - 1:
+                depth -= 1
+            if agent == 0: # if the agent is Pacman
+                return max_value(state, agent, depth, alpha, beta)
+            else: # if the agent is a ghost
+                return min_value(state, agent, depth, alpha, beta)
+            
+        # initial call, starting with agent = Pacman
+        bestMove = minimax(gameState, 0, self.depth, -99999, 99999)
+        return bestMove[1]
         util.raiseNotDefined()
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
