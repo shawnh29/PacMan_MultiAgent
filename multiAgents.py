@@ -278,13 +278,12 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         def exp_value(state, agent, depth):
-            # minV = [99999, ""]
             actions = state.getLegalActions(agent)
             len_actions = len(actions)
             val = [0, ""]
 
             for move in actions:
-                # computing the 
+                # computing the average value of the utility
                 temp = (minimax(state.generateSuccessor(agent, move), agent + 1, depth)[0]) / len_actions
                 val[0] = val[0] + temp
             return val
@@ -326,7 +325,10 @@ def betterEvaluationFunction(currentGameState):
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION: give score based on how much food is left
+                 if the ghosts are in a scared state, then we encourage Pacman to eat the ghosts
+                 by adding additional score
+                 score is also based on the distances between ghosts
     """
     "*** YOUR CODE HERE ***"
     score = currentGameState.getScore()
@@ -336,23 +338,13 @@ def betterEvaluationFunction(currentGameState):
     scaredTimes = [gState.scaredTimer for gState in ghostStates]
     totalScaredTimes = sum(scaredTimes)
     foodList = currentGameState.getFood().asList()
-    capPositions = currentGameState.getCapsules()
 
-    # fdistance = 9999
-    # for food in foodList:
-    #     fdistance = min(manhattanDistance(food, position), fdistance)
-    #     # distance = manhattanDistance(food, position)
-    # score += 500 - len(foodList)*5 - fdistance
-    # fDistance = 0
-    # for food in foodList:
-    #     fDistance += manhattanDistance(food, position)
-
-    # print(d)
     score += len(foodList) 
 
     gDistance = 0
     for g in currentGameState.getGhostPositions():
         gDistance += manhattanDistance(g, position)
+    
     # ghost = currentGameState.getGhostPosition(1)
     # gDistance = manhattanDistance(ghost, position)
     # if gDistance > 3:
@@ -360,97 +352,12 @@ def betterEvaluationFunction(currentGameState):
     # else:
     #     score -= 15
 
-    # score += len(capPositions)
-    
-
-    # cDistance = 9999
-    # for cap in capPositions:
-    #     cDistance = min(manhattanDistance(cap, position), cDistance)
-    # score += 600 - len(capPositions)*5 - cDistance
-
     if totalScaredTimes > 0:
         score += totalScaredTimes - gDistance
     else:
         score += gDistance 
 
     return score
-
-###################################################
-    # actions = currentGameState.getLegalPacmanActions()
-
-    # # ghostPosition = currentGameState.getGhostPosition()
-    # current_score = currentGameState.getScore()
-    # cur_pacman_pos = currentGameState.getPacmanPosition()
-    # foodList = currentGameState.getFood().asList()
-    # # newFood = None
-
-    # for action in actions:
-    #     successorState = currentGameState.generatePacmanSuccessor(action)
-    #     newPos = successorState.getPacmanPosition()
-    #     newFood = successorState.getFood().asList()
-
-    #     closest_food = 99999
-
-    #     for food in newFood:
-    #         distance = manhattanDistance(food, newPos)
-    #         if distance < closest_food:
-    #             closest_food = distance
-        
-    #     closest_ghost = 99999
-    #     ghostPositions = successorState.getGhostPositions()
-    #     for ghost in ghostPositions:
-    #         gDistance = manhattanDistance(ghost, newPos)
-    #         if gDistance < closest_ghost:
-    #             closest_ghost = gDistance
-        
-    #     if newPos in currentGameState.getCapsules():
-    #         current_score += 250
-
-    #     if cur_pacman_pos != newPos:
-    #         current_score += 15
-
-    #     if closest_ghost > 4:
-    #         current_score += 200
-    #     else:
-    #         current_score -= 15
-        
-    #     current_score += 100 / closest_food
-    
-    # if len(foodList) > len(newFood):
-    #     current_score += 100
-    # return current_score
-#################################
-
-
-    # print("STATE ", type(currentGameState))
-    # successorGameState = currentGameState.generatePacmanSuccessor()
-    # newPos = successorGameState.getPacmanPosition()
-    # newFood = successorGameState.getFood()
-    # newGhostStates = successorGameState.getGhostStates()
-    # current_pacman_pos = currentGameState.getPacmanPosition()
-    # current_score = currentGameState.getScore()
-    # foodList = newFood.asList()
-
-    # min_food = 9999
-    # for food in foodList:
-    #     distance = manhattanDistance(food, newPos)
-    #     if distance < min_food:
-    #         min_food = distance
-    # ghostPosition = successorGameState.getGhostPosition(1)
-    # ghostDistance = manhattanDistance(ghostPosition, newPos)
-    # if ghostDistance > 4:
-    #     current_score += 200
-    # else:
-    #     current_score -= 15
-    
-    # if current_pacman_pos != newPos:
-    #     current_score += 10
-
-    # current_score += 100 / min_food
-    # if len(currentGameState.getFood().asList()) > len(foodList):
-    #     current_score += 100
-
-    # return current_score
     util.raiseNotDefined()
 
 # Abbreviation
